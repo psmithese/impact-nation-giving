@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "421320065355",
+    "project_id": "impact-nation-fund-raising",
+    "storage_bucket": "impact-nation-fund-raising.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:421320065355:android:cea48a52865179430568ce",
+        "android_client_info": {
+          "package_name": "com.example.impact_nation_fund_raising"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "421320065355-0sbuoljgbuaf8p2bqg0hh4q6ggv419ti.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.impact_nation_fund_raising",
+            "certificate_hash": "c4a6e7cee40c1936125bbef77c5bb07cec944f0a"
+          }
+        },
+        {
+          "client_id": "421320065355-ku279k2snse49l6qlij1509af6kgtilh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAD0kVpFCZ0_1TaIv2fWnnGNP8-6Ws5oV8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "421320065355-ku279k2snse49l6qlij1509af6kgtilh.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "421320065355-6nb2d276rub0l3g6iej4fn0iam6pj01a.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.impactNationFundRaising"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

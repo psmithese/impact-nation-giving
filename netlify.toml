@@ -1,0 +1,40 @@
+[build]
+  publish = "build/web"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cross-Origin-Opener-Policy = "same-origin-allow-popups"
+
+[[redirects]]
+  from = "/"
+  to = "/landing.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/landing"
+  to = "/landing.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/download"
+  to = "/landing.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/portal/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/app/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

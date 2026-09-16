@@ -1,0 +1,172 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper functions ──────────────────────────────────────────────────────
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isCurrentUser(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function getRole() {
+      return getUserData().role;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && getRole() in ['SUPER_ADMIN', 'ADMIN', 'FINANCE_OFFICER'];
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() && getRole() == 'SUPER_ADMIN';
+    }
+
+    // ── Users collection ─────────────────────────────────────────────────────
+
+    match /users/{userId} {
+      // Any authenticated user can read their own profile
+      allow read: if isAuthenticated() && isCurrentUser(userId);
+      
+      // Admins can read all user profiles
+      allow read: if isAdmin();
+
+      // Users can only update their own non-sensitive fields
+      allow update: if isAuthenticated()
+        && isCurrentUser(userId)
+        && !request.resource.data.diff(resource.data).affectedKeys()
+            .hasAny(['role', 'status', 'uid']);
+
+      // Only super admins can change roles/status
+      allow update: if isSuperAdmin();
+
+      // New user creation is handled server-side (Firebase Auth trigger)
+      allow create: if isAuthenticated() && isCurrentUser(userId);
+    }
+
+    // ── Campaigns collection ──────────────────────────────────────────────────
+
+    match /campaigns/{campaignId} {
+      // All authenticated users can read campaigns
+      allow read: if isAuthenticated();
+      
+      // Admins can do anything
+      allow create, delete: if isAdmin();
+      
+      // Admins can update fully. Members can update specific stats when pledging.
+      allow update: if isAdmin() || (
+        isAuthenticated() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['totalPledged', 'participantsCount', 'updatedAt'])
+      );
+    }
+
+    // ── Pledges collection ────────────────────────────────────────────────────
+
+    match /pledges/{pledgeId} {
+      // Users can only read their own pledges; admins can read all
+      allow read: if isAuthenticated()
+        && (isCurrentUser(resource.data.userId) || isAdmin());
+
+      // Members can create a pledge for themselves
+      allow create: if isAuthenticated()
+        && isCurrentUser(request.resource.data.userId)
+        && request.resource.data.amountPaid == 0
+        && request.resource.data.status == 'PLEDGED';
+
+      // Members CANNOT update pledge fields directly
+      // Only server-side (via contribution verification transactions) can update:
+      // amountPaid, status, outstandingBalance
+      allow update: if isAdmin();
+
+      allow delete: if isSuperAdmin();
+    }
+
+    // ── Contributions collection ──────────────────────────────────────────────
+
+    match /contributions/{contributionId} {
+      // Members can only read their own contributions; admins can read all
+      allow read: if isAuthenticated()
+        && (isCurrentUser(resource.data.userId) || isAdmin());
+
+      // Members can ONLY create contributions for themselves
+      // And they must start as PENDING_VERIFICATION — never VERIFIED
+      allow create: if isAuthenticated()
+        && isCurrentUser(request.resource.data.userId)
+        && request.resource.data.status == 'PENDING_VERIFICATION'
+        && (!request.resource.data.keys().hasAny(['verifiedBy', 'verifiedAt'])
+            || (request.resource.data.verifiedBy == null && request.resource.data.verifiedAt == null));
+
+      // Members CANNOT update any contribution once submitted
+      // Only admins can update (verify/reject)
+      allow update: if isAdmin()
+        // Admins cannot change core financial details — only status fields
+        && !request.resource.data.diff(resource.data).affectedKeys()
+            .hasAny(['amount', 'userId', 'pledgeId', 'campaignId', 'paymentMethod']);
+
+      // Only super admins can delete
+      allow delete: if isSuperAdmin();
+    }
+    // ── Receipts collection ───────────────────────────────────────────────────
+
+    match /receipts/{receiptId} {
+      // Receipts are public for verification purposes
+      // They do not contain sensitive PII
+      allow read: if true;
+
+      // Only admins can generate receipts
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ── Transparency Settings ──────────────────────────────────────────────────
+
+    match /settings/{settingId} {
+      // Any authenticated user can read settings (like visibility)
+      allow read: if isAuthenticated();
+      
+      // Only admins can update settings
+      allow write: if isAdmin();
+    }
+
+    // ── Public Contributors ────────────────────────────────────────────────────
+
+    match /public_contributors/{contributorId} {
+      // Any authenticated user can read public contributors
+      allow read: if isAuthenticated();
+      
+      // Only admins (via sync process) can write to public contributors
+      allow write: if isAdmin();
+    }
+
+    // ── Notifications ──────────────────────────────────────────────────────────
+
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid || 
+        resource.data.userId == 'ALL' || 
+        resource.data.userId.matches('CAMPAIGN_.*')
+      );
+      // Admins can create broadcasts; members can create self-notifications (e.g. payment submitted)
+      allow create: if (
+        isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid
+      ) || isAdmin();
+      allow update: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid
+      ) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']);
+      allow delete: if isAdmin();
+    }
+
+    // ── Audit Logs ─────────────────────────────────────────────────────────────
+
+    match /audit_logs/{logId} {
+      allow read: if isSuperAdmin();
+      allow create: if isAdmin();
+    }
+  }
+}

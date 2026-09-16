@@ -1,0 +1,75 @@
+{
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "**/AssetManifest.bin",
+      "**/*.bin",
+      "**/*.apk",
+      "**/*.wasm",
+      "**/*.frag",
+      "**/*.symbols"
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Cross-Origin-Opener-Policy",
+            "value": "same-origin-allow-popups"
+          }
+        ]
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/",
+        "destination": "/landing.html"
+      },
+      {
+        "source": "/landing",
+        "destination": "/landing.html"
+      },
+      {
+        "source": "/download",
+        "destination": "/landing.html"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "impact-nation-fund-raising",
+          "appId": "1:421320065355:android:cea48a52865179430568ce",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "impact-nation-fund-raising",
+          "configurations": {
+            "android": "1:421320065355:android:cea48a52865179430568ce",
+            "ios": "1:421320065355:ios:85412fa90c3d3bf60568ce",
+            "macos": "1:421320065355:ios:85412fa90c3d3bf60568ce",
+            "web": "1:421320065355:web:f1882cbd04bf2fd20568ce",
+            "windows": "1:421320065355:web:4f7bfe9bcf62ff650568ce"
+          }
+        }
+      }
+    }
+  }
+}
