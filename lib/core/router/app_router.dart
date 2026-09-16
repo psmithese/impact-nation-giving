@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -52,15 +53,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/splash',
+    initialLocation: kIsWeb ? '/welcome' : '/splash',
     redirect: (context, state) {
-      if (authState.isLoading) return null;
-
       final user = authState.value;
       final isAuth = user != null;
       final path = state.uri.path;
 
-      if (path == '/') return '/splash';
+      if (path == '/') return kIsWeb ? '/welcome' : '/splash';
 
       final isSplash = path == '/splash';
       final isVerify = path.startsWith('/verify');
@@ -72,6 +71,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
       // Allow public access to receipt verification
       if (isVerify) return null;
+
+      // When auth is still loading, allow public routes and don't stall web on splash
+      if (authState.isLoading) {
+        if (kIsWeb && isSplash) return '/welcome';
+        return null;
+      }
 
       // Not authenticated
       if (!isAuth) {
