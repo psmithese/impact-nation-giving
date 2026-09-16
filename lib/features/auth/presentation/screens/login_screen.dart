@@ -247,6 +247,17 @@ class _MobileLoginLayout extends StatelessWidget {
                       letterSpacing: 2.5,
                     ),
                   ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '“Helping others to rise”',
+                    style: TextStyle(
+                      color: AppColors.goldLight.withValues(alpha: 0.9),
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -405,6 +416,32 @@ class _DesktopLoginLayout extends StatelessWidget {
                             ),
 
                             const Spacer(),
+
+                            // Church Motto badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.goldLight.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: AppColors.goldLight.withValues(alpha: 0.35),
+                                ),
+                              ),
+                              child: const Text(
+                                '“Helping others to rise”',
+                                style: TextStyle(
+                                  color: AppColors.goldLight,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  fontStyle: FontStyle.italic,
+                                  letterSpacing: 0.4,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 18),
 
                             // Main headline
                             Text(
