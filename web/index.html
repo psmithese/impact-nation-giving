@@ -32,8 +32,150 @@
 
   <title>Impact Nation Giving</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #080D1A;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow: hidden;
+    }
+    #loading-indicator {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 35%, #0E1D42 0%, #080D1A 100%);
+      z-index: 999999;
+      transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+    }
+    .loading-logo-wrapper {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .loading-logo-glow {
+      position: absolute;
+      inset: -10px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(251, 191, 36, 0.4) 0%, transparent 70%);
+      animation: pulseGlow 2.2s infinite ease-in-out;
+    }
+    .loading-logo {
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2.5px solid #FBBF24;
+      box-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
+      position: relative;
+      z-index: 2;
+    }
+    .loading-title {
+      color: #FFFFFF;
+      font-size: 21px;
+      font-weight: 800;
+      margin-top: 22px;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #FFFFFF 40%, #FBBF24 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .loading-motto {
+      color: #FBBF24;
+      font-size: 13.5px;
+      font-style: italic;
+      font-weight: 500;
+      margin-top: 6px;
+      letter-spacing: 0.6px;
+      opacity: 0.95;
+    }
+    .loading-bar-container {
+      width: 180px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      margin-top: 26px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(251, 191, 36, 0.2);
+    }
+    .loading-bar {
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, #FBBF24, transparent);
+      position: absolute;
+      border-radius: 999px;
+      animation: shimmer 1.4s infinite ease-in-out;
+    }
+    .loading-subtext {
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 12px;
+      margin-top: 14px;
+      letter-spacing: 0.8px;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.15); opacity: 1; }
+    }
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(250%); }
+    }
+  </style>
 </head>
 <body>
+  <div id="loading-indicator">
+    <div class="loading-logo-wrapper">
+      <div class="loading-logo-glow"></div>
+      <img src="images/ingc_logo.png" alt="Impact Nation Logo" class="loading-logo">
+    </div>
+    <div class="loading-title">Impact Nation Giving</div>
+    <div class="loading-motto">“Helping others to rise”</div>
+    <div class="loading-bar-container">
+      <div class="loading-bar"></div>
+    </div>
+    <div class="loading-subtext">Loading Giving Portal...</div>
+  </div>
+
+  <script>
+    function hideLoader() {
+      const loader = document.getElementById('loading-indicator');
+      if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(function() {
+          if (loader.parentNode) loader.parentNode.removeChild(loader);
+        }, 500);
+      }
+    }
+
+    // Hide loader as soon as Flutter attaches elements to DOM
+    var observer = new MutationObserver(function(mutations, obs) {
+      for (var i = 0; i < mutations.length; i++) {
+        var added = mutations[i].addedNodes;
+        for (var j = 0; j < added.length; j++) {
+          var n = added[j];
+          if (n.nodeType === 1 && (n.tagName === 'FLT-GLASS-PANE' || n.tagName === 'FLT-SCENE-HOST' || n.className === 'flt-glass-pane')) {
+            hideLoader();
+            obs.disconnect();
+            return;
+          }
+        }
+      }
+    });
+    observer.observe(document.body, { childList: true });
+
+    window.addEventListener('flutter-first-frame', hideLoader);
+    // Fallback: hide after 8s maximum
+    setTimeout(hideLoader, 8000);
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
