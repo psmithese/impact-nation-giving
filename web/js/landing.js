@@ -54,11 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Generate Dynamic Real Scannable QR Code ─────────────────────
   const qrContainer = document.getElementById('qrCodeContainer');
   if (qrContainer) {
-    // If testing on localhost, phone camera cannot access localhost IP, so provide live fallback
-    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const downloadUrl = isLocal
-      ? 'https://impact-nation-fund-raising.web.app/downloads/impact-nation-giving.apk'
-      : `${window.location.origin}/downloads/impact-nation-giving.apk`;
+    const downloadUrl = 'https://github.com/psmithese/impact-nation-giving/releases/download/v1.0.0/ImpactNationGiving.apk';
 
     qrContainer.innerHTML = '';
     if (typeof QRCode !== 'undefined') {
