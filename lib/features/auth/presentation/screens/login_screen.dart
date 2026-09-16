@@ -408,7 +408,7 @@ class _DesktopLoginLayout extends StatelessWidget {
 
                             // Main headline
                             Text(
-                              'Admin\nPortal',
+                              'Giving\nPortal',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 52,
@@ -426,7 +426,7 @@ class _DesktopLoginLayout extends StatelessWidget {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'Manage fundraising campaigns,\nverify contributions & generate reports.',
+                              'Empowering Kingdom giving,\npledge tracking & verified receipts.',
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.65),
                                 fontSize: 16,
