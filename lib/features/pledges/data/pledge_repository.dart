@@ -37,6 +37,21 @@ class PledgeRepository {
     });
   }
 
+  /// Stream ALL pledges for a campaign — for the admin pledge management screen.
+  Stream<List<Pledge>> watchAllPledgesForCampaign(String campaignId) {
+    return _pledges
+        .where('campaignId', isEqualTo: campaignId)
+        .snapshots()
+        .map((snapshot) {
+      final pledges = snapshot.docs
+          .map((doc) => Pledge.fromMap(doc.data(), doc.id))
+          .toList();
+      // Sort newest first, in memory to avoid a composite index
+      pledges.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return pledges;
+    });
+  }
+
   /// Create a new pledge.
   /// (amountPaid is initially 0, and status is computed to PLEDGED automatically)
   Future<void> createPledge({
@@ -90,6 +105,38 @@ class PledgeRepository {
         'totalPledged': currentPledged + pledgedAmount,
         'participantsCount': currentParticipants + 1,
       });
+    });
+  }
+
+  /// Deletes a pledge (super admin only) and atomically corrects the campaign
+  /// [participantsCount] and [totalPledged] counters so they stay in sync.
+  Future<void> deletePledge({
+    required String pledgeId,
+    required String campaignId,
+    required double pledgedAmount,
+  }) async {
+    await _firestore.runTransaction((transaction) async {
+      final pledgeRef = _pledges.doc(pledgeId);
+      final campaignRef = _firestore.collection('campaigns').doc(campaignId);
+      final campaignDoc = await transaction.get(campaignRef);
+
+      // Delete the pledge document
+      transaction.delete(pledgeRef);
+
+      // Atomically correct campaign counters
+      if (campaignDoc.exists) {
+        final currentPledged =
+            (campaignDoc.data()?['totalPledged'] as num?)?.toDouble() ?? 0.0;
+        final currentParticipants =
+            (campaignDoc.data()?['participantsCount'] as num?)?.toInt() ?? 0;
+
+        transaction.update(campaignRef, {
+          'totalPledged':
+              (currentPledged - pledgedAmount).clamp(0.0, double.infinity),
+          'participantsCount':
+              (currentParticipants - 1).clamp(0, double.maxFinite.toInt()),
+        });
+      }
     });
   }
 }

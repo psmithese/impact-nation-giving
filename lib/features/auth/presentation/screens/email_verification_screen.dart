@@ -8,10 +8,12 @@ class EmailVerificationScreen extends ConsumerStatefulWidget {
   const EmailVerificationScreen({super.key});
 
   @override
-  ConsumerState<EmailVerificationScreen> createState() => _EmailVerificationScreenState();
+  ConsumerState<EmailVerificationScreen> createState() =>
+      _EmailVerificationScreenState();
 }
 
-class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScreen> {
+class _EmailVerificationScreenState
+    extends ConsumerState<EmailVerificationScreen> {
   Future<void> _checkVerification() async {
     final repo = ref.read(authRepositoryProvider);
     await repo.reloadUser();
@@ -19,30 +21,27 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
       context.go('/home');
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Email not verified yet')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Email not verified yet')));
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<AsyncValue<void>>(
-      authControllerProvider,
-      (_, state) {
-        state.whenOrNull(
-          error: (error, _) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(error.toString())),
-            );
-          },
-          data: (_) {
-            // Can show a success message if resend is tapped
-          },
-        );
-      },
-    );
+    ref.listen<AsyncValue<void>>(authControllerProvider, (_, state) {
+      state.whenOrNull(
+        error: (error, _) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(error.toString())));
+        },
+        data: (_) {
+          // Can show a success message if resend is tapped
+        },
+      );
+    });
 
     final authState = ref.watch(authControllerProvider);
 
@@ -57,23 +56,24 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
             const Icon(Icons.mark_email_unread, size: 80, color: Colors.grey),
             const SizedBox(height: 24),
             const Text(
-              'A verification email has been sent to your email address. Please check your inbox and verify your email to continue.',
+              'A verification link has been sent to your email. Please check your inbox or spam folder to verify your account',
               style: TextStyle(fontSize: 16),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
-            AppButton(
-              text: 'I have verified',
-              onPressed: _checkVerification,
-            ),
+            AppButton(text: 'I have verified', onPressed: _checkVerification),
             const SizedBox(height: 16),
             OutlinedButton(
               onPressed: authState.isLoading
                   ? null
                   : () {
-                      ref.read(authControllerProvider.notifier).sendEmailVerification();
+                      ref
+                          .read(authControllerProvider.notifier)
+                          .sendEmailVerification();
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Verification email resent')),
+                        const SnackBar(
+                          content: Text('Verification email resent'),
+                        ),
                       );
                     },
               style: OutlinedButton.styleFrom(

@@ -1,4 +1,5 @@
 // ignore_for_file: constant_identifier_names
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum PledgeStatus {
   NO_PLEDGE,
@@ -40,6 +41,14 @@ class Pledge {
     return PledgeStatus.PLEDGED;
   }
 
+  static DateTime _parseDate(dynamic val) {
+    if (val == null) return DateTime.now();
+    if (val is Timestamp) return val.toDate();
+    if (val is int) return DateTime.fromMillisecondsSinceEpoch(val);
+    if (val is String) return DateTime.tryParse(val) ?? DateTime.now();
+    return DateTime.now();
+  }
+
   factory Pledge.fromMap(Map<String, dynamic> map, String id) {
     return Pledge(
       id: id,
@@ -51,12 +60,8 @@ class Pledge {
         (e) => e.name == map['status'],
         orElse: () => PledgeStatus.PLEDGED,
       ),
-      createdAt: map['createdAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int)
-          : DateTime.now(),
-      updatedAt: map['updatedAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] as int)
-          : DateTime.now(),
+      createdAt: _parseDate(map['createdAt']),
+      updatedAt: _parseDate(map['updatedAt']),
     );
   }
 

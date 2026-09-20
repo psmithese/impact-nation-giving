@@ -66,9 +66,7 @@ class _ReceiptCard extends StatelessWidget {
     return Card(
       elevation: 4,
       shadowColor: Colors.black.withValues(alpha: 0.1),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -87,25 +85,32 @@ class _ReceiptCard extends StatelessWidget {
                         'IMPACT NATION GOSPEL CENTER',
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primaryDark,
+                          color: const Color.fromARGB(255, 195, 208, 239),
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Official Receipt',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.6,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.success.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.success.withValues(alpha: 0.5)),
+                    border: Border.all(
+                      color: AppColors.success.withValues(alpha: 0.5),
+                    ),
                   ),
                   child: const Text(
                     'VERIFIED',
@@ -118,62 +123,88 @@ class _ReceiptCard extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             // Receipt Number & Date
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Receipt No.', style: theme.textTheme.labelSmall),
-                    Text(receipt.id, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
-                  ],
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Receipt No.', style: theme.textTheme.labelSmall),
+                      Text(
+                        receipt.id,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ],
+                  ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text('Date', style: theme.textTheme.labelSmall),
-                    Text(dateFormat.format(receipt.verifiedAt), style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
-                  ],
+                const SizedBox(width: 12),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text('Date', style: theme.textTheme.labelSmall),
+                      Text(
+                        dateFormat.format(receipt.verifiedAt),
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.end,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-            
+
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 24),
               child: Divider(),
             ),
-            
+
             // Details
             _DetailRow(label: 'Received From', value: receipt.memberName),
             const SizedBox(height: 16),
             _DetailRow(label: 'Campaign', value: receipt.campaignName),
             const SizedBox(height: 16),
             _DetailRow(
-              label: 'Payment Method', 
-              value: receipt.paymentMethod == 'BANK_TRANSFER' ? 'Bank Transfer' : 'Cash',
+              label: 'Payment Method',
+              value: receipt.paymentMethod == 'BANK_TRANSFER'
+                  ? 'Bank Transfer'
+                  : 'Cash',
             ),
-            
+
             if (receipt.transferReference != null) ...[
               const SizedBox(height: 16),
-              _DetailRow(label: 'Transfer Ref', value: receipt.transferReference!),
+              _DetailRow(
+                label: 'Transfer Ref',
+                value: receipt.transferReference!,
+              ),
             ],
 
             if (receipt.receivedBy != null) ...[
               const SizedBox(height: 16),
               _DetailRow(label: 'Cash Given To', value: receipt.receivedBy!),
             ],
-            
+
             const SizedBox(height: 32),
-            
+
             // Total Amount
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                color: theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.4,
+                ),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -184,7 +215,7 @@ class _ReceiptCard extends StatelessWidget {
                     currency.format(receipt.amount),
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
+                      color: const Color.fromARGB(255, 64, 90, 177),
                     ),
                   ),
                 ],
@@ -213,7 +244,9 @@ class _DetailRow extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
               fontSize: 14,
             ),
           ),
@@ -221,10 +254,7 @@ class _DetailRow extends StatelessWidget {
         Expanded(
           child: Text(
             value,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-            ),
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
             textAlign: TextAlign.right,
           ),
         ),

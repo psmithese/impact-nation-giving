@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:impact_nation_fund_raising/core/utils/currency_formatter.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/utils/image_provider_util.dart';
@@ -27,8 +28,12 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBody(BuildContext context, ThemeData theme,
-      ColorScheme colorScheme, MemberProfile? profile) {
+  Widget _buildBody(
+    BuildContext context,
+    ThemeData theme,
+    ColorScheme colorScheme,
+    MemberProfile? profile,
+  ) {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       body: CustomScrollView(
@@ -52,8 +57,10 @@ class HomeScreen extends ConsumerWidget {
                 ),
                 child: SafeArea(
                   child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -61,7 +68,9 @@ class HomeScreen extends ConsumerWidget {
                         Text(
                           _greeting(),
                           style: const TextStyle(
-                              color: Colors.white70, fontSize: 14),
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -91,19 +100,26 @@ class HomeScreen extends ConsumerWidget {
                 builder: (ctx, ref, _) {
                   final mode = ref.watch(themeModeProvider);
                   IconData icon;
-                  if (mode == ThemeMode.light) icon = Icons.dark_mode_outlined;
-                  else if (mode == ThemeMode.dark) icon = Icons.brightness_auto_outlined;
-                  else icon = Icons.light_mode_outlined;
+                  if (mode == ThemeMode.light)
+                    icon = Icons.dark_mode_outlined;
+                  else if (mode == ThemeMode.dark)
+                    icon = Icons.brightness_auto_outlined;
+                  else
+                    icon = Icons.light_mode_outlined;
                   return IconButton(
                     tooltip: 'Toggle Theme',
                     icon: Icon(icon, color: Colors.white),
-                    onPressed: () => ref.read(themeModeProvider.notifier).toggleTheme(),
+                    onPressed: () =>
+                        ref.read(themeModeProvider.notifier).toggleTheme(),
                   );
                 },
               ),
               if (profile != null) ...[
                 IconButton(
-                  icon: const Icon(Icons.notifications_none, color: Colors.white),
+                  icon: const Icon(
+                    Icons.notifications_none,
+                    color: Colors.white,
+                  ),
                   onPressed: () => context.push('/home/notifications'),
                 ),
                 GestureDetector(
@@ -120,9 +136,10 @@ class HomeScreen extends ConsumerWidget {
                           ? Text(
                               _initials(profile.fullName),
                               style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13),
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
                             )
                           : null,
                     ),
@@ -146,9 +163,12 @@ class HomeScreen extends ConsumerWidget {
                 const SizedBox(height: 24),
 
                 // Section header
-                Text('Quick Actions',
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700)),
+                Text(
+                  'Quick Actions',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
                 const SizedBox(height: 12),
 
                 // Quick actions grid
@@ -156,9 +176,12 @@ class HomeScreen extends ConsumerWidget {
                 const SizedBox(height: 24),
 
                 // Section header
-                Text('Latest Updates',
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700)),
+                Text(
+                  'Latest Updates',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
                 const SizedBox(height: 12),
 
                 // Activity feed
@@ -204,7 +227,10 @@ class _CampaignCard extends ConsumerWidget {
         final progress = campaign.progressPercentage;
         final raised = campaign.totalVerified;
         final goal = campaign.targetAmount;
-        final remainingDays = campaign.endDate.difference(DateTime.now()).inDays.clamp(0, 9999);
+        final remainingDays = campaign.endDate
+            .difference(DateTime.now())
+            .inDays
+            .clamp(0, 9999);
 
         return GestureDetector(
           onTap: () => context.push('/home/campaign'),
@@ -236,38 +262,52 @@ class _CampaignCard extends ConsumerWidget {
                         color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.volunteer_activism,
-                          color: Colors.white, size: 22),
+                      child: const Icon(
+                        Icons.volunteer_activism,
+                        color: Colors.white,
+                        size: 22,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(campaign.name,
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 16)),
-                          Text('Impact Nation Gospel Center',
-                              style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.75),
-                                  fontSize: 12)),
+                          Text(
+                            campaign.name,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            'Impact Nation Gospel Center',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.75),
+                              fontSize: 12,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                     Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Text(campaign.status.name,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600)),
+                      child: Text(
+                        campaign.status.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -279,8 +319,9 @@ class _CampaignCard extends ConsumerWidget {
                   child: LinearProgressIndicator(
                     value: progress,
                     backgroundColor: Colors.white.withValues(alpha: 0.25),
-                    valueColor:
-                        const AlwaysStoppedAnimation<Color>(Colors.white),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      Colors.white,
+                    ),
                     minHeight: 8,
                   ),
                 ),
@@ -292,15 +333,17 @@ class _CampaignCard extends ConsumerWidget {
                     Text(
                       '₦${_fmt(raised)} raised',
                       style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18),
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                      ),
                     ),
                     Text(
                       'of ₦${_fmt(goal)}',
                       style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.75),
-                          fontSize: 13),
+                        color: Colors.white.withValues(alpha: 0.75),
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
@@ -308,7 +351,9 @@ class _CampaignCard extends ConsumerWidget {
                 Text(
                   '${(progress * 100).toStringAsFixed(0)}% funded · $remainingDays days remaining',
                   style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.75), fontSize: 12),
+                    color: Colors.white.withValues(alpha: 0.75),
+                    fontSize: 12,
+                  ),
                 ),
                 const SizedBox(height: 16),
 
@@ -321,7 +366,8 @@ class _CampaignCard extends ConsumerWidget {
                       foregroundColor: AppColors.primary,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     child: const Row(
@@ -329,8 +375,10 @@ class _CampaignCard extends ConsumerWidget {
                       children: [
                         Icon(Icons.add_card_rounded, size: 18),
                         SizedBox(width: 8),
-                        Text('Make a Pledge',
-                            style: TextStyle(fontWeight: FontWeight.w700)),
+                        Text(
+                          'Make a Pledge',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
                       ],
                     ),
                   ),
@@ -343,8 +391,7 @@ class _CampaignCard extends ConsumerWidget {
     );
   }
 
-  String _fmt(double v) =>
-      v >= 1000 ? '${(v / 1000).toStringAsFixed(1)}k' : v.toStringAsFixed(0);
+  String _fmt(double v) => CurrencyFormatter.formatCompact(v);
 }
 
 // ── Stats Row ──────────────────────────────────────────────────────────────
@@ -358,15 +405,27 @@ class _StatsRow extends ConsumerWidget {
     final members = campaign?.participantsCount ?? 0;
     final pledged = campaign?.totalPledged ?? 0.0;
     final verified = campaign?.totalVerified ?? 0.0;
-    final fmtK = (double v) => v >= 1000 ? '₦${(v / 1000).toStringAsFixed(1)}k' : '₦${v.toStringAsFixed(0)}';
+    String fmtK(double v) => CurrencyFormatter.formatCompactCurrency(v);
 
     return Row(
       children: [
-        _StatChip(icon: Icons.group_rounded, label: 'Participants', value: '$members'),
+        _StatChip(
+          icon: Icons.group_rounded,
+          label: 'Participants',
+          value: '$members',
+        ),
         const SizedBox(width: 10),
-        _StatChip(icon: Icons.handshake_rounded, label: 'Pledged', value: fmtK(pledged)),
+        _StatChip(
+          icon: Icons.handshake_rounded,
+          label: 'Pledged',
+          value: fmtK(pledged),
+        ),
         const SizedBox(width: 10),
-        _StatChip(icon: Icons.verified_rounded, label: 'Collected', value: fmtK(verified)),
+        _StatChip(
+          icon: Icons.verified_rounded,
+          label: 'Collected',
+          value: fmtK(verified),
+        ),
       ],
     );
   }
@@ -376,8 +435,11 @@ class _StatChip extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
-  const _StatChip(
-      {required this.icon, required this.label, required this.value});
+  const _StatChip({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -386,21 +448,27 @@ class _StatChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest
-              .withValues(alpha: 0.6),
+          color: theme.colorScheme.surfaceContainerHighest.withValues(
+            alpha: 0.6,
+          ),
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
           children: [
             Icon(icon, color: AppColors.primary, size: 20),
             const SizedBox(height: 6),
-            Text(value,
-                style: theme.textTheme.titleSmall
-                    ?.copyWith(fontWeight: FontWeight.w700)),
-            Text(label,
-                style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurface
-                        .withValues(alpha: 0.55))),
+            Text(
+              value,
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            Text(
+              label,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
+              ),
+            ),
           ],
         ),
       ),
@@ -418,25 +486,29 @@ class _QuickActionsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final actions = [
       _Action(
-          icon: Icons.add_card_rounded,
-          label: 'Make\nPledge',
-          color: AppColors.primary,
-          onTap: () => context.push('/home/campaign')),
+        icon: Icons.add_card_rounded,
+        label: 'Make\nPledge',
+        color: AppColors.primary,
+        onTap: () => context.push('/home/campaign'),
+      ),
       _Action(
-          icon: Icons.receipt_long_rounded,
-          label: 'My\nPledges',
-          color: const Color(0xFF7B1FA2),
-          onTap: () => context.go('/pledges')),
+        icon: Icons.receipt_long_rounded,
+        label: 'My\nPledges',
+        color: const Color(0xFF7B1FA2),
+        onTap: () => context.go('/pledges'),
+      ),
       _Action(
-          icon: Icons.person_rounded,
-          label: 'My\nProfile',
-          color: AppColors.secondary,
-          onTap: () => context.go('/profile')),
+        icon: Icons.person_rounded,
+        label: 'My\nProfile',
+        color: AppColors.secondary,
+        onTap: () => context.go('/profile'),
+      ),
       _Action(
-          icon: Icons.notifications_outlined,
-          label: 'Updates',
-          color: AppColors.gold,
-          onTap: () => context.push('/home/notifications')),
+        icon: Icons.notifications_outlined,
+        label: 'Updates',
+        color: AppColors.gold,
+        onTap: () => context.push('/home/notifications'),
+      ),
     ];
 
     return GridView.count(
@@ -446,9 +518,7 @@ class _QuickActionsGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: 8,
       crossAxisSpacing: 8,
-      children: actions
-          .map((a) => _QuickActionItem(action: a))
-          .toList(),
+      children: actions.map((a) => _QuickActionItem(action: a)).toList(),
     );
   }
 }
@@ -458,11 +528,12 @@ class _Action {
   final String label;
   final Color color;
   final VoidCallback onTap;
-  const _Action(
-      {required this.icon,
-      required this.label,
-      required this.color,
-      required this.onTap});
+  const _Action({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
 }
 
 class _QuickActionItem extends StatelessWidget {
@@ -513,7 +584,7 @@ class _QuickActionItem extends StatelessWidget {
 class _ActivityFeed extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final contributionsAsync = ref.watch(allContributionsProvider);
+    final contributionsAsync = ref.watch(myContributionsProvider);
     final theme = Theme.of(context);
 
     return contributionsAsync.when(
@@ -530,8 +601,9 @@ class _ActivityFeed extends ConsumerWidget {
           return Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest
-                  .withValues(alpha: 0.5),
+              color: theme.colorScheme.surfaceContainerHighest.withValues(
+                alpha: 0.5,
+              ),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Center(
@@ -539,7 +611,8 @@ class _ActivityFeed extends ConsumerWidget {
                 'No activity yet — be the first to contribute! 🙏',
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.55)),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
+                ),
               ),
             ),
           );
@@ -551,8 +624,9 @@ class _ActivityFeed extends ConsumerWidget {
             final icon = isVerified
                 ? Icons.check_circle_rounded
                 : Icons.upload_rounded;
-            final iconColor =
-                isVerified ? AppColors.success : AppColors.primary;
+            final iconColor = isVerified
+                ? AppColors.success
+                : AppColors.primary;
             final action = isVerified
                 ? 'contribution of ₦${_fmt(c.amount)} verified ✓'
                 : 'submitted a payment of ₦${_fmt(c.amount)}';
@@ -562,8 +636,9 @@ class _ActivityFeed extends ConsumerWidget {
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest
-                    .withValues(alpha: 0.5),
+                color: theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.5,
+                ),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
@@ -579,15 +654,18 @@ class _ActivityFeed extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Member',
-                          style: theme.textTheme.bodySmall
-                              ?.copyWith(fontWeight: FontWeight.w700),
+                          'You',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                         Text(
                           action,
                           style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.6)),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.6,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -595,8 +673,10 @@ class _ActivityFeed extends ConsumerWidget {
                   Text(
                     timeAgo,
                     style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.45)),
+                      color: theme.colorScheme.onSurface.withValues(
+                        alpha: 0.45,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -607,8 +687,7 @@ class _ActivityFeed extends ConsumerWidget {
     );
   }
 
-  String _fmt(double v) =>
-      v >= 1000 ? '${(v / 1000).toStringAsFixed(1)}k' : v.toStringAsFixed(0);
+  String _fmt(double v) => CurrencyFormatter.formatCompact(v);
 
   String _timeAgo(DateTime dt) {
     final diff = DateTime.now().difference(dt);

@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:intl/intl.dart';
@@ -8,7 +9,11 @@ class ReceiptService {
   static Future<Uint8List> generateReceiptPdf(Receipt receipt) async {
     final pdf = pw.Document();
 
-    final currency = NumberFormat.currency(symbol: '₦', decimalDigits: 0);
+    // Load the church logo from assets
+    final logoBytes = await rootBundle.load('assets/images/ingc_logo.png');
+    final logoImage = pw.MemoryImage(logoBytes.buffer.asUint8List());
+
+    final currency = NumberFormat.currency(symbol: 'NGN ', decimalDigits: 0);
     final dateFormat = DateFormat('dd MMM yyyy, hh:mm a');
 
     pdf.addPage(
@@ -19,29 +24,37 @@ class ReceiptService {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              // Header
+              // Header: logo on left, VERIFIED badge on right
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
                 children: [
-                  pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  // Church logo + name stacked
+                  pw.Row(
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
                     children: [
-                      pw.Text(
-                        'IMPACT NATION GOSPEL CENTER',
-                        style: pw.TextStyle(
-                          fontSize: 20,
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColors.blue900,
-                        ),
-                      ),
-                      pw.SizedBox(height: 4),
-                      pw.Text(
-                        'Contribution Receipt',
-                        style: pw.TextStyle(
-                          fontSize: 16,
-                          color: PdfColors.grey700,
-                        ),
+                      pw.Image(logoImage, width: 56, height: 56),
+                      pw.SizedBox(width: 10),
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text(
+                            'IMPACT NATION GOSPEL CENTER',
+                            style: pw.TextStyle(
+                              fontSize: 14,
+                              fontWeight: pw.FontWeight.bold,
+                              color: PdfColors.blue900,
+                            ),
+                          ),
+                          pw.SizedBox(height: 3),
+                          pw.Text(
+                            'Contribution Receipt',
+                            style: pw.TextStyle(
+                              fontSize: 12,
+                              color: PdfColors.grey700,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

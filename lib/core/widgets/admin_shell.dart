@@ -26,7 +26,7 @@ class _AdminShellState extends ConsumerState<AdminShell> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       try {
-        ref.read(fcmServiceProvider).init();
+        ref.read(fcmServiceProvider).init(context);
       } catch (e) {
         debugPrint('FCM init ignored: $e');
       }

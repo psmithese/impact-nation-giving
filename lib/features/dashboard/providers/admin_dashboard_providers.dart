@@ -34,7 +34,7 @@ class AdminDashboardStats {
 final adminDashboardStatsProvider = FutureProvider.autoDispose<AdminDashboardStats>((
   ref,
 ) async {
-  final activeCampaign = await ref.watch(activeCampaignProvider.future);
+  final activeCampaign = ref.watch(activeCampaignProvider).value;
   if (activeCampaign == null) {
     // No active campaign — return zeroed-out stats instead of crashing
     return AdminDashboardStats(

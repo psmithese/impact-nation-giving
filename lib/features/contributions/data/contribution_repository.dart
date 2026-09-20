@@ -207,11 +207,17 @@ class ContributionRepository {
   // ── Streams ──────────────────────────────────────────────────────────────────
 
   /// All contributions for a specific pledge (member view).
-  Stream<List<Contribution>> watchContributionsForPledge(String pledgeId) {
-    return _contributions
-        .where('pledgeId', isEqualTo: pledgeId)
-        .snapshots()
-        .map((snapshot) {
+  /// If [userId] is provided, filters by userId as well to satisfy Firestore security rules.
+  Stream<List<Contribution>> watchContributionsForPledge(
+    String pledgeId, {
+    String? userId,
+  }) {
+    Query<Map<String, dynamic>> query =
+        _contributions.where('pledgeId', isEqualTo: pledgeId);
+    if (userId != null && userId.isNotEmpty) {
+      query = query.where('userId', isEqualTo: userId);
+    }
+    return query.snapshots().map((snapshot) {
       final list = snapshot.docs
           .map((doc) => Contribution.fromMap(doc.data(), doc.id))
           .toList();

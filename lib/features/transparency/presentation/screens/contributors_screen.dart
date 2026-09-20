@@ -260,10 +260,10 @@ class _ContributorCard extends StatelessWidget {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                  backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.12),
                   backgroundImage: contributor.photoUrl != null ? getImageProvider(contributor.photoUrl!) : null,
                   child: contributor.photoUrl == null
-                      ? const Icon(Icons.person, color: AppColors.primary)
+                      ? Icon(Icons.person, color: theme.colorScheme.primary)
                       : null,
                 ),
                 const SizedBox(width: 12),

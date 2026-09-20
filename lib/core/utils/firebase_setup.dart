@@ -16,10 +16,16 @@ class FirebaseSetup {
       debugPrint('Firebase.initializeApp failed: $e');
     }
 
-    // Initialize Google Sign-In safely — skip on web since we use signInWithPopup
+    // Initialize Google Sign-In safely — skip on web since we use signInWithPopup.
+    // serverClientId is the Web OAuth 2.0 client (client_type 3) from
+    // google-services.json. It is required on Android so that the Credential
+    // Manager returns an idToken that Firebase can verify.
     if (!kIsWeb) {
       try {
-        await GoogleSignIn.instance.initialize();
+        await GoogleSignIn.instance.initialize(
+          serverClientId:
+              '421320065355-ku279k2snse49l6qlij1509af6kgtilh.apps.googleusercontent.com',
+        );
       } catch (e) {
         debugPrint('GoogleSignIn.initialize failed: $e');
       }

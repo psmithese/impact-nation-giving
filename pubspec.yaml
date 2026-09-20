@@ -51,6 +51,7 @@ dependencies:
   share_plus: ^13.3.0
   fl_chart: ^1.2.0
   firebase_messaging: ^16.6.0
+  flutter_local_notifications: ^18.0.0
   firebase_analytics: any
   firebase_crashlytics: any
   firebase_app_check: any

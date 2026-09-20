@@ -60,8 +60,8 @@ class _SubmitContributionScreenState
         child: Wrap(
           children: [
             ListTile(
-              leading: const Icon(Icons.photo_library_rounded,
-                  color: AppColors.primary),
+              leading: Icon(Icons.photo_library_rounded,
+                  color: Theme.of(ctx).colorScheme.primary),
               title: const Text('Choose from Gallery'),
               onTap: () async {
                 Navigator.of(ctx).pop();
@@ -76,8 +76,8 @@ class _SubmitContributionScreenState
               },
             ),
             ListTile(
-              leading: const Icon(Icons.camera_alt_rounded,
-                  color: AppColors.primary),
+              leading: Icon(Icons.camera_alt_rounded,
+                  color: Theme.of(ctx).colorScheme.primary),
               title: const Text('Take Photo of Slip / Receipt'),
               onTap: () async {
                 Navigator.of(ctx).pop();
@@ -157,18 +157,18 @@ class _SubmitContributionScreenState
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppColors.primary.withValues(alpha: 0.08),
-                    AppColors.primary.withValues(alpha: 0.03),
+                    theme.colorScheme.primary.withValues(alpha: 0.12),
+                    theme.colorScheme.primary.withValues(alpha: 0.04),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.15)),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.25)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.account_balance_wallet_rounded,
-                      color: AppColors.primary),
+                  Icon(Icons.account_balance_wallet_rounded,
+                      color: theme.colorScheme.primary),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
@@ -177,12 +177,12 @@ class _SubmitContributionScreenState
                         Text('Outstanding Balance',
                             style: theme.textTheme.labelSmall?.copyWith(
                                 color: theme.colorScheme.onSurface
-                                    .withValues(alpha: 0.6))),
+                                    .withValues(alpha: 0.7))),
                         Text(
                           currency.format(widget.pledge.outstandingBalance),
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
+                            color: theme.colorScheme.primary,
                           ),
                         ),
                       ],
@@ -289,7 +289,7 @@ class _SubmitContributionScreenState
                 'Enter the full name of the church official, pastor, or finance officer who received the cash.',
                 style: TextStyle(
                   fontSize: 12,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
             ],
@@ -301,41 +301,41 @@ class _SubmitContributionScreenState
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.08),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.25)),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.25)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.account_balance_rounded,
-                            color: AppColors.primary, size: 18),
+                        Icon(Icons.account_balance_rounded,
+                            color: theme.colorScheme.primary, size: 18),
                         const SizedBox(width: 8),
                         Text('Transfer To',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
+                              color: theme.colorScheme.primary,
                               fontSize: 13,
                             )),
                       ],
                     ),
                     const SizedBox(height: 10),
-                    _BankDetailRow(label: 'Bank', value: 'GTBank'),
-                    _BankDetailRow(
+                    const _BankDetailRow(label: 'Bank', value: 'GTBank'),
+                    const _BankDetailRow(
                         label: 'Account Name',
                         value: 'IMPACT NATION GOSPEL CENTER'),
-                    _BankDetailRow(
+                    const _BankDetailRow(
                         label: 'Account Number', value: '3005256062'),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     Text(
                       'After transferring to the church account above, please attach your payment slip or receipt screenshot below.',
                       style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.primary.withValues(alpha: 0.8)),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.75)),
                     ),
                   ],
                 ),
@@ -350,10 +350,10 @@ class _SubmitContributionScreenState
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.3),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.35),
                       style: BorderStyle.solid,
                     ),
-                    color: AppColors.primary.withValues(alpha: 0.03),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.05),
                   ),
                   child: _proofFile == null
                       ? Center(
@@ -362,21 +362,19 @@ class _SubmitContributionScreenState
                             children: [
                               Icon(Icons.receipt_long_rounded,
                                   size: 38,
-                                  color: AppColors.primary
-                                      .withValues(alpha: 0.7)),
+                                  color: theme.colorScheme.primary),
                               const SizedBox(height: 8),
                               Text('Upload Payment Slip / Receipt',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
-                                      color: AppColors.primary
-                                          .withValues(alpha: 0.9))),
+                                      color: theme.colorScheme.primary)),
                               const SizedBox(height: 4),
                               Text('Tap to select screenshot or take a photo',
                                   style: TextStyle(
                                       fontSize: 12,
-                                      color: AppColors.primary
-                                          .withValues(alpha: 0.6))),
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.65))),
                             ],
                           ),
                         )
@@ -448,6 +446,7 @@ class _MethodCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -457,13 +456,13 @@ class _MethodCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: selected
-                ? AppColors.primary
-                : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                ? theme.colorScheme.primary
+                : theme.colorScheme.outline.withValues(alpha: 0.3),
             width: selected ? 2 : 1,
           ),
           color: selected
-              ? AppColors.primary.withValues(alpha: 0.08)
-              : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+              ? theme.colorScheme.primary.withValues(alpha: 0.12)
+              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -471,16 +470,16 @@ class _MethodCard extends StatelessWidget {
             Icon(icon,
                 size: 20,
                 color: selected
-                    ? AppColors.primary
-                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.5)),
             const SizedBox(width: 8),
             Text(label,
                 style: TextStyle(
                   fontWeight:
                       selected ? FontWeight.bold : FontWeight.normal,
                   color: selected
-                      ? AppColors.primary
-                      : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 )),
           ],
         ),
@@ -496,6 +495,7 @@ class _BankDetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
@@ -505,18 +505,19 @@ class _BankDetailRow extends StatelessWidget {
             width: 110,
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
-                color: AppColors.textSecondaryLight,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
               ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface,
               ),
             ),
           ),

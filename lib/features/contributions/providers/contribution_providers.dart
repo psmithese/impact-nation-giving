@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../auth/domain/models/app_user.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../notifications/data/notification_repository.dart';
 import '../../notifications/domain/models/app_notification.dart';
@@ -22,9 +23,15 @@ final myContributionsProvider = StreamProvider<List<Contribution>>((ref) {
 /// Contributions for a specific pledge.
 final pledgeContributionsProvider =
     StreamProvider.family<List<Contribution>, String>((ref, pledgeId) {
+  final user = ref.watch(authStateChangesProvider).value;
+  if (user == null) return const Stream.empty();
+  final isMember = user.role == UserRole.MEMBER;
   return ref
       .watch(contributionRepositoryProvider)
-      .watchContributionsForPledge(pledgeId);
+      .watchContributionsForPledge(
+        pledgeId,
+        userId: isMember ? user.uid : null,
+      );
 });
 
 /// Pending contributions awaiting admin verification.

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/providers/auth_provider.dart';
+import '../../features/auth/providers/onboarding_provider.dart';
 import '../../features/auth/domain/models/app_user.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/welcome_screen.dart';
@@ -29,6 +30,7 @@ import '../../features/campaigns/presentation/screens/create_edit_campaign_scree
 import '../../features/pledges/domain/models/pledge.dart';
 import '../../features/pledges/presentation/screens/my_pledges_screen.dart';
 import '../../features/pledges/presentation/screens/make_pledge_screen.dart';
+import '../../features/pledges/presentation/screens/admin_pledges_screen.dart';
 
 import '../../features/contributions/presentation/screens/submit_contribution_screen.dart';
 import '../../features/contributions/presentation/screens/my_contributions_screen.dart';
@@ -50,16 +52,28 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateChangesProvider);
+  final hasSeenOnboarding = ref.watch(onboardingCompletedProvider);
+
+  final initialRoute = kIsWeb
+      ? (hasSeenOnboarding ? '/login' : '/welcome')
+      : '/splash';
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: kIsWeb ? '/welcome' : '/splash',
+    initialLocation: initialRoute,
     redirect: (context, state) {
       final user = authState.value;
       final isAuth = user != null;
       final path = state.uri.path;
 
-      if (path == '/') return kIsWeb ? '/welcome' : '/splash';
+      final unauthLanding = hasSeenOnboarding ? '/login' : '/welcome';
+
+      if (path == '/') {
+        if (isAuth) {
+          return user.role == UserRole.MEMBER ? '/home' : '/admin/dashboard';
+        }
+        return kIsWeb ? unauthLanding : '/splash';
+      }
 
       final isSplash = path == '/splash';
       final isVerify = path.startsWith('/verify');
@@ -74,14 +88,20 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
       // When auth is still loading, allow public routes and don't stall web on splash
       if (authState.isLoading) {
-        if (kIsWeb && isSplash) return '/welcome';
+        if (kIsWeb && isSplash) return unauthLanding;
         return null;
       }
 
       // Not authenticated
       if (!isAuth) {
-        if (isSplash || !isAuthRoute) return '/welcome';
+        if (isSplash || !isAuthRoute) return unauthLanding;
+        if (path == '/welcome' && hasSeenOnboarding) return '/login';
         return null;
+      }
+
+      // If authenticated, also ensure onboarding is completed in preferences
+      if (!hasSeenOnboarding) {
+        ref.read(onboardingCompletedProvider.notifier).completeOnboarding();
       }
 
       // Authenticated — check email verification
@@ -280,7 +300,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'pledges',
                     parentNavigatorKey: _rootNavigatorKey,
-                    builder: (context, _) => const PlaceholderScreen(title: 'Admin Pledges'),
+                    builder: (context, _) => const AdminPledgesScreen(),
                   ),
                   GoRoute(
                     path: 'payments',

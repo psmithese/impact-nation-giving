@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/loading_state.dart';
 import '../../../../core/widgets/error_state.dart';
 import '../../providers/campaign_providers.dart';
@@ -266,12 +267,7 @@ class CampaignDetailScreen extends ConsumerWidget {
   }
 
   String _formatCurrency(double amount) {
-    if (amount >= 1000000) {
-      return '${(amount / 1000000).toStringAsFixed(2)}M';
-    } else if (amount >= 1000) {
-      return '${(amount / 1000).toStringAsFixed(1)}k';
-    }
-    return amount.toStringAsFixed(0);
+    return CurrencyFormatter.formatCompact(amount);
   }
 
   String _formatDate(DateTime date) {

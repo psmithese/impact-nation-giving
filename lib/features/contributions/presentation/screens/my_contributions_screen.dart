@@ -29,6 +29,9 @@ class MyContributionsScreen extends ConsumerWidget {
         foregroundColor: Colors.white,
       ),
       body: contribAsync.when(
+        skipLoadingOnReload: true,
+        skipLoadingOnRefresh: true,
+        skipError: contribAsync.hasValue,
         loading: () => const LoadingState(),
         error: (e, _) => ErrorState(message: e.toString()),
         data: (contributions) => CustomScrollView(
@@ -43,7 +46,7 @@ class MyContributionsScreen extends ConsumerWidget {
                     _SummaryRow(
                       label: 'Pledged',
                       value: currency.format(pledge.pledgedAmount),
-                      color: AppColors.primary,
+                      color: theme.colorScheme.primary,
                     ),
                     const SizedBox(height: 8),
                     _SummaryRow(

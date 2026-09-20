@@ -146,7 +146,10 @@
   </div>
 
   <script>
+    var loaderRemoved = false;
     function hideLoader() {
+      if (loaderRemoved) return;
+      loaderRemoved = true;
       const loader = document.getElementById('loading-indicator');
       if (loader) {
         loader.style.opacity = '0';
@@ -156,25 +159,21 @@
       }
     }
 
-    // Hide loader as soon as Flutter attaches elements to DOM
+    // Flutter fires 'flutter-first-frame' when UI is completely ready & drawn
+    window.addEventListener('flutter-first-frame', hideLoader);
+
+    // Also observe when Flutter paints content inside canvas / glass pane
     var observer = new MutationObserver(function(mutations, obs) {
-      for (var i = 0; i < mutations.length; i++) {
-        var added = mutations[i].addedNodes;
-        for (var j = 0; j < added.length; j++) {
-          var n = added[j];
-          if (n.nodeType === 1 && (n.tagName === 'FLT-GLASS-PANE' || n.tagName === 'FLT-SCENE-HOST' || n.className === 'flt-glass-pane')) {
-            hideLoader();
-            obs.disconnect();
-            return;
-          }
-        }
+      var fltScene = document.querySelector('flt-scene, flt-glass-pane canvas, [flt-renderer]');
+      if (fltScene) {
+        setTimeout(hideLoader, 400);
+        obs.disconnect();
       }
     });
-    observer.observe(document.body, { childList: true });
+    observer.observe(document.body, { childList: true, subtree: true });
 
-    window.addEventListener('flutter-first-frame', hideLoader);
-    // Fallback: hide after 8s maximum
-    setTimeout(hideLoader, 8000);
+    // Safety fallback
+    setTimeout(hideLoader, 10000);
   </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>

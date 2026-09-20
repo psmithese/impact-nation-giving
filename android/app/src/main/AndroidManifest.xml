@@ -46,6 +46,16 @@
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="impact_nation_channel"/>
 
+        <!-- FCM default notification icon (shown when app is backgrounded/terminated) -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/ic_launcher"/>
+
+        <!-- FCM default notification colour -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/notification_color"/>
+
         <!-- Flutter embedding version -->
         <meta-data
             android:name="flutterEmbedding"

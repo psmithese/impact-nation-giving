@@ -49,10 +49,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
-      ref.read(authControllerProvider.notifier).signIn(
-            _emailController.text.trim(),
-            _passwordController.text,
-          );
+      ref
+          .read(authControllerProvider.notifier)
+          .signIn(_emailController.text.trim(), _passwordController.text);
     }
   }
 
@@ -184,84 +183,70 @@ class _MobileLoginLayout extends StatelessWidget {
         ),
       ),
       child: SafeArea(
-        child: Stack(
-          children: [
-            // Back button
-            Positioned(
-              left: 8,
-              top: 8,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
-                onPressed: () => context.go('/welcome'),
-              ),
-            ),
-            // Logo and title centered
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.3),
-                        width: 2,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.goldLight.withValues(alpha: 0.2),
-                          blurRadius: 20,
-                          spreadRadius: 5,
-                        ),
-                      ],
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/images/ingc_logo.png',
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(
-                          Icons.church_rounded,
-                          color: Colors.white,
-                          size: 32,
-                        ),
-                      ),
-                    ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    width: 2,
                   ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'IMPACT NATION',
-                    style: TextStyle(
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.goldLight.withValues(alpha: 0.2),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/ingc_logo.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const Icon(
+                      Icons.church_rounded,
                       color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 2,
+                      size: 32,
                     ),
                   ),
-                  Text(
-                    'GOSPEL CENTER',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.65),
-                      fontSize: 11,
-                      letterSpacing: 2.5,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '“Helping others to rise”',
-                    style: TextStyle(
-                      color: AppColors.goldLight.withValues(alpha: 0.9),
-                      fontSize: 12,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 12),
+              const Text(
+                'IMPACT NATION',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 2,
+                ),
+              ),
+              Text(
+                'GOSPEL CENTER',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.65),
+                  fontSize: 11,
+                  letterSpacing: 2.5,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '“Helping others to rise”',
+                style: TextStyle(
+                  color: AppColors.goldLight.withValues(alpha: 0.9),
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -363,14 +348,16 @@ class _DesktopLoginLayout extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color:
-                                          Colors.white.withValues(alpha: 0.25),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.25,
+                                      ),
                                       width: 1.5,
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: AppColors.goldLight
-                                            .withValues(alpha: 0.3),
+                                        color: AppColors.goldLight.withValues(
+                                          alpha: 0.3,
+                                        ),
                                         blurRadius: 20,
                                         spreadRadius: 4,
                                       ),
@@ -404,8 +391,9 @@ class _DesktopLoginLayout extends StatelessWidget {
                                     Text(
                                       'GOSPEL CENTER',
                                       style: TextStyle(
-                                        color:
-                                            Colors.white.withValues(alpha: 0.55),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.55,
+                                        ),
                                         fontSize: 10,
                                         letterSpacing: 2.5,
                                       ),
@@ -424,10 +412,14 @@ class _DesktopLoginLayout extends StatelessWidget {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.goldLight.withValues(alpha: 0.15),
+                                color: AppColors.goldLight.withValues(
+                                  alpha: 0.15,
+                                ),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
-                                  color: AppColors.goldLight.withValues(alpha: 0.35),
+                                  color: AppColors.goldLight.withValues(
+                                    alpha: 0.35,
+                                  ),
                                 ),
                               ),
                               child: const Text(
@@ -454,8 +446,7 @@ class _DesktopLoginLayout extends StatelessWidget {
                                 letterSpacing: -0.5,
                                 shadows: [
                                   Shadow(
-                                    color:
-                                        Colors.black.withValues(alpha: 0.3),
+                                    color: Colors.black.withValues(alpha: 0.3),
                                     blurRadius: 16,
                                   ),
                                 ],
@@ -483,15 +474,12 @@ class _DesktopLoginLayout extends StatelessWidget {
                                       height: 32,
                                       decoration: BoxDecoration(
                                         color: f.$3.withValues(alpha: 0.15),
-                                        borderRadius:
-                                            BorderRadius.circular(8),
+                                        borderRadius: BorderRadius.circular(8),
                                         border: Border.all(
-                                          color:
-                                              f.$3.withValues(alpha: 0.3),
+                                          color: f.$3.withValues(alpha: 0.3),
                                         ),
                                       ),
-                                      child:
-                                          Icon(f.$1, color: f.$3, size: 16),
+                                      child: Icon(f.$1, color: f.$3, size: 16),
                                     ),
                                     const SizedBox(width: 12),
                                     Column(
@@ -509,8 +497,9 @@ class _DesktopLoginLayout extends StatelessWidget {
                                         Text(
                                           f.$4,
                                           style: TextStyle(
-                                            color: Colors.white
-                                                .withValues(alpha: 0.5),
+                                            color: Colors.white.withValues(
+                                              alpha: 0.5,
+                                            ),
                                             fontSize: 11,
                                           ),
                                         ),
@@ -554,8 +543,9 @@ class _DesktopLoginLayout extends StatelessWidget {
                           Text(
                             'Sign in to your Impact Nation account',
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.6),
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.6,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 40),
@@ -580,8 +570,9 @@ class _DesktopLoginLayout extends StatelessWidget {
                               Text(
                                 "Don't have an account? ",
                                 style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: theme.colorScheme.onSurface
-                                      .withValues(alpha: 0.6),
+                                  color: theme.colorScheme.onSurface.withValues(
+                                    alpha: 0.6,
+                                  ),
                                 ),
                               ),
                               GestureDetector(
@@ -696,8 +687,7 @@ class _LoginForm extends StatelessWidget {
             onFieldSubmitted: (_) => onSubmit(),
             decoration: InputDecoration(
               labelText: 'Password',
-              prefixIcon:
-                  const Icon(Icons.lock_outline_rounded, size: 20),
+              prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
               prefixIconColor: AppColors.primary,
               suffixIcon: IconButton(
                 icon: Icon(
@@ -794,8 +784,7 @@ class _LoginForm extends StatelessWidget {
                 child: Text(
                   'OR',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                     letterSpacing: 1,
                   ),
                 ),
@@ -810,8 +799,8 @@ class _LoginForm extends StatelessWidget {
             onPressed: authState.isLoading
                 ? null
                 : () => ref
-                    .read(authControllerProvider.notifier)
-                    .signInWithGoogle(),
+                      .read(authControllerProvider.notifier)
+                      .signInWithGoogle(),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14),
               minimumSize: const Size(double.infinity, 54),
@@ -846,8 +835,7 @@ class _LoginForm extends StatelessWidget {
                 Text(
                   "Don't have an account? ",
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
                 GestureDetector(

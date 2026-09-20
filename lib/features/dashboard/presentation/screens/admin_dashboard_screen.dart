@@ -1,7 +1,9 @@
+import 'dart:math' show max;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/image_provider_util.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/widgets/loading_state.dart';
@@ -114,12 +116,13 @@ class AdminDashboardScreen extends ConsumerWidget {
                 builder: (ctx, ref, _) {
                   final mode = ref.watch(themeModeProvider);
                   IconData icon;
-                  if (mode == ThemeMode.light)
+                  if (mode == ThemeMode.light) {
                     icon = Icons.dark_mode_outlined;
-                  else if (mode == ThemeMode.dark)
+                  } else if (mode == ThemeMode.dark) {
                     icon = Icons.brightness_auto_outlined;
-                  else
+                  } else {
                     icon = Icons.light_mode_outlined;
+                  }
                   return IconButton(
                     tooltip: 'Toggle Theme',
                     icon: Icon(icon, color: Colors.white),
@@ -220,8 +223,11 @@ class AdminDashboardScreen extends ConsumerWidget {
 
   String _initials(String? name) {
     if (name == null || name.trim().isEmpty) return '?';
-    final parts =
-        name.trim().split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+    final parts = name
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((w) => w.isNotEmpty)
+        .toList();
     if (parts.isEmpty) return '?';
     return parts.map((w) => w[0]).take(2).join().toUpperCase();
   }
@@ -295,10 +301,7 @@ class _OverviewGrid extends ConsumerWidget {
     );
   }
 
-  String _fmtK(double v) {
-    if (v >= 1000) return '${(v / 1000).toStringAsFixed(1)}k';
-    return v.toStringAsFixed(0);
-  }
+  String _fmtK(double v) => CurrencyFormatter.formatCompact(v);
 }
 
 class _OverviewCard extends StatelessWidget {
@@ -411,13 +414,17 @@ class _CampaignSummaryCard extends ConsumerWidget {
                     size: 20,
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    campaign.name,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
+                  Expanded(
+                    child: Text(
+                      campaign.name,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const Spacer(),
+                  const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
@@ -483,10 +490,7 @@ class _CampaignSummaryCard extends ConsumerWidget {
     );
   }
 
-  String _fmtK(double v) {
-    if (v >= 1000) return '${(v / 1000).toStringAsFixed(1)}k';
-    return v.toStringAsFixed(0);
-  }
+  String _fmtK(double v) => CurrencyFormatter.formatCompact(v);
 }
 
 // ── Admin Quick Actions ──────────────────────────────────────────────────────
@@ -500,6 +504,12 @@ class _AdminQuickActions extends StatelessWidget {
         'Members',
         AppColors.primary,
         () => context.go('/admin/members'),
+      ),
+      (
+        Icons.handshake_rounded,
+        'Pledges',
+        const Color(0xFF1565C0),
+        () => context.push('/admin/dashboard/pledges'),
       ),
       (
         Icons.visibility_rounded,
@@ -522,7 +532,7 @@ class _AdminQuickActions extends StatelessWidget {
     ];
 
     return GridView.count(
-      crossAxisCount: 4,
+      crossAxisCount: 5,
       childAspectRatio: 0.75,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -635,49 +645,60 @@ class _AdminCharts extends ConsumerWidget {
       ),
       error: (err, _) => const _NoCampaignCard(),
       data: (stats) {
-        if (stats.totalTarget == 0) {
+        if (stats.totalTarget == 0 &&
+            stats.totalPledged == 0 &&
+            stats.totalVerified == 0) {
           return const _NoCampaignCard();
         }
 
-        final barChart = _buildBarChart(theme, stats);
-        final pieChart = _buildPieChart(theme, stats);
+        // Wrap in ErrorWidget boundary so a chart rendering bug
+        // shows a card rather than a grey screen in release mode.
+        Widget buildCharts() {
+          final barChart = _buildBarChart(theme, stats);
+          final pieChart = _buildPieChart(theme, stats);
 
-        if (isDesktop) {
-          // Side-by-side on wide screens
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(child: barChart),
-              const SizedBox(width: 16),
-              Expanded(child: pieChart),
-            ],
+          if (isDesktop) {
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: barChart),
+                const SizedBox(width: 16),
+                Expanded(child: pieChart),
+              ],
+            );
+          }
+          return Column(
+            children: [barChart, const SizedBox(height: 16), pieChart],
           );
         }
 
-        // Stacked on mobile
-        return Column(
-          children: [
-            barChart,
-            const SizedBox(height: 16),
-            pieChart,
-          ],
-        );
+        try {
+          return buildCharts();
+        } catch (_) {
+          return const _NoCampaignCard();
+        }
       },
     );
   }
 
   Widget _buildBarChart(ThemeData theme, dynamic stats) {
+    // Dynamically compute safeMaxY so bars never exceed the axis ceiling.
+    final safeMaxY =
+        max(
+          max(stats.totalTarget as double, stats.totalPledged as double),
+          stats.totalVerified as double,
+        ) *
+        1.15;
+    final axisMaxY = safeMaxY > 0 ? safeMaxY : 1000.0;
+
     return Container(
-      height: 250,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: theme.colorScheme.outline.withValues(alpha: 0.15),
         ),
-        color: theme.colorScheme.surfaceContainerHighest.withValues(
-          alpha: 0.3,
-        ),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -689,29 +710,32 @@ class _AdminCharts extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          // Use SizedBox (not Expanded) so fl_chart always has bounded height on web
           SizedBox(
             height: 180,
             child: BarChart(
               BarChartData(
                 alignment: BarChartAlignment.spaceAround,
-                maxY: stats.totalTarget > 0 ? stats.totalTarget : 1000,
+                maxY: axisMaxY,
                 barTouchData: BarTouchData(enabled: true),
                 titlesData: FlTitlesData(
                   show: true,
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
+                      reservedSize: 28,
                       getTitlesWidget: (value, meta) {
-                        final labels = ['Target', 'Pledged', 'Paid'];
-                        if (value.toInt() >= 0 &&
-                            value.toInt() < labels.length) {
-                          return Text(
-                            labels[value.toInt()],
-                            style: const TextStyle(fontSize: 10),
+                        const labels = ['Target', 'Pledged', 'Paid'];
+                        final idx = value.toInt();
+                        if (idx >= 0 && idx < labels.length) {
+                          return SideTitleWidget(
+                            meta: meta,
+                            child: Text(
+                              labels[idx],
+                              style: const TextStyle(fontSize: 10),
+                            ),
                           );
                         }
-                        return const Text('');
+                        return const SizedBox.shrink();
                       },
                     ),
                   ),
@@ -732,7 +756,7 @@ class _AdminCharts extends ConsumerWidget {
                     x: 0,
                     barRods: [
                       BarChartRodData(
-                        toY: stats.totalTarget,
+                        toY: stats.totalTarget > 0 ? stats.totalTarget : 0.0,
                         color: Colors.grey.withValues(alpha: 0.5),
                         width: 22,
                         borderRadius: BorderRadius.circular(4),
@@ -743,7 +767,7 @@ class _AdminCharts extends ConsumerWidget {
                     x: 1,
                     barRods: [
                       BarChartRodData(
-                        toY: stats.totalPledged,
+                        toY: stats.totalPledged > 0 ? stats.totalPledged : 0.0,
                         color: AppColors.primary,
                         width: 22,
                         borderRadius: BorderRadius.circular(4),
@@ -754,7 +778,9 @@ class _AdminCharts extends ConsumerWidget {
                     x: 2,
                     barRods: [
                       BarChartRodData(
-                        toY: stats.totalVerified,
+                        toY: stats.totalVerified > 0
+                            ? stats.totalVerified
+                            : 0.0,
                         color: AppColors.secondary,
                         width: 22,
                         borderRadius: BorderRadius.circular(4),
@@ -765,23 +791,109 @@ class _AdminCharts extends ConsumerWidget {
               ),
             ),
           ),
+          const SizedBox(height: 8),
+          // Legend row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _LegendDot(
+                color: Colors.grey.withValues(alpha: 0.5),
+                label: 'Target',
+              ),
+              _LegendDot(color: AppColors.primary, label: 'Pledged'),
+              _LegendDot(color: AppColors.secondary, label: 'Paid'),
+            ],
+          ),
         ],
       ),
     );
   }
 
   Widget _buildPieChart(ThemeData theme, dynamic stats) {
+    // Guard: compute total and filter out zero/negative values.
+    final Map<String, double> validMethods = {};
+    for (final e in (stats.paymentMethods as Map<String, double>).entries) {
+      if (e.value > 0) validMethods[e.key] = e.value;
+    }
+    final totalPayments = validMethods.values.fold(0.0, (a, b) => a + b);
+
+    // If no valid payment data, show a clean placeholder.
+    if (totalPayments <= 0 || validMethods.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: theme.colorScheme.outline.withValues(alpha: 0.15),
+          ),
+          color: theme.colorScheme.surfaceContainerHighest.withValues(
+            alpha: 0.3,
+          ),
+        ),
+        child: Column(
+          children: [
+            Text(
+              'Payment Methods',
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 40),
+            Icon(
+              Icons.pie_chart_outline_rounded,
+              size: 48,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'No payment data yet',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
+              ),
+            ),
+            const SizedBox(height: 40),
+          ],
+        ),
+      );
+    }
+
+    // Build sections with percentage labels to avoid overflow on small slices.
+    final colors = [
+      AppColors.primary,
+      AppColors.secondary,
+      Colors.orange,
+      Colors.purple,
+      Colors.teal,
+    ];
+    int colorIdx = 0;
+    final legendItems = <({Color color, String label, double value})>[];
+    final sections = validMethods.entries.map((e) {
+      final color = colors[colorIdx % colors.length];
+      colorIdx++;
+      final pct = (e.value / totalPayments * 100).toStringAsFixed(0);
+      final label = e.key.replaceAll('_', ' ');
+      legendItems.add((color: color, label: label, value: e.value));
+      return PieChartSectionData(
+        color: color,
+        value: e.value,
+        title: '$pct%',
+        radius: 42,
+        titleStyle: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      );
+    }).toList();
+
     return Container(
-      height: 250,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: theme.colorScheme.outline.withValues(alpha: 0.15),
         ),
-        color: theme.colorScheme.surfaceContainerHighest.withValues(
-          alpha: 0.3,
-        ),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -793,37 +905,59 @@ class _AdminCharts extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          // Use SizedBox (not Expanded) so fl_chart always has bounded height on web
           SizedBox(
-            height: 180,
-            child: stats.paymentMethods.isEmpty
-                ? const Center(child: Text('No payment data'))
-                : PieChart(
-                    PieChartData(
-                      sectionsSpace: 2,
-                      centerSpaceRadius: 40,
-                      sections: stats.paymentMethods.entries.map((e) {
-                        final color =
-                            e.key.toUpperCase().contains('CASH')
-                            ? AppColors.secondary
-                            : AppColors.primary;
-                        return PieChartSectionData(
-                          color: color,
-                          value: e.value,
-                          title: e.key,
-                          radius: 40,
-                          titleStyle: const TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
+            height: 160,
+            child: PieChart(
+              PieChartData(
+                sectionsSpace: 2,
+                centerSpaceRadius: 36,
+                sections: sections,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Legend
+          Wrap(
+            spacing: 12,
+            runSpacing: 6,
+            alignment: WrapAlignment.center,
+            children: legendItems
+                .map((item) => _LegendDot(color: item.color, label: item.label))
+                .toList(),
           ),
         ],
       ),
+    );
+  }
+}
+
+// ── Legend Dot ─────────────────────────────────────────────────────────────────
+
+class _LegendDot extends StatelessWidget {
+  final Color color;
+  final String label;
+  const _LegendDot({required this.color, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.7),
+          ),
+        ),
+      ],
     );
   }
 }

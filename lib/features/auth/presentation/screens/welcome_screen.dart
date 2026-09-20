@@ -1,21 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/adaptive_layout.dart';
+import '../../providers/onboarding_provider.dart';
 
 /// Premium multi-page onboarding + welcome screen
-class WelcomeScreen extends StatefulWidget {
+class WelcomeScreen extends ConsumerStatefulWidget {
   const WelcomeScreen({super.key});
 
   @override
-  State<WelcomeScreen> createState() => _WelcomeScreenState();
+  ConsumerState<WelcomeScreen> createState() => _WelcomeScreenState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen>
+class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
     with TickerProviderStateMixin {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+
+  void _completeAndGo(String route) {
+    ref.read(onboardingCompletedProvider.notifier).completeOnboarding();
+    context.go(route);
+  }
 
   static const _pages = [
     _OnboardPage(
@@ -99,7 +106,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(0, 8, 16, 0),
                   child: TextButton(
-                    onPressed: isLastPage ? null : () => context.go('/login'),
+                    onPressed: isLastPage ? null : () => _completeAndGo('/login'),
                     child: Text(
                       'Skip',
                       style: TextStyle(
@@ -243,7 +250,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
                       // Primary: Sign In
                       GestureDetector(
-                        onTap: () => context.go('/login'),
+                        onTap: () => _completeAndGo('/login'),
                         child: Container(
                           height: 56,
                           decoration: BoxDecoration(
@@ -280,7 +287,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
                       // Secondary: Create Account
                       GestureDetector(
-                        onTap: () => context.go('/register'),
+                        onTap: () => _completeAndGo('/register'),
                         child: Container(
                           height: 56,
                           decoration: BoxDecoration(
@@ -424,7 +431,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       key: const ValueKey('final'),
       children: [
         GestureDetector(
-          onTap: () => context.go('/login'),
+          onTap: () => _completeAndGo('/login'),
           child: Container(
             height: 56,
             decoration: BoxDecoration(
@@ -456,7 +463,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         ),
         const SizedBox(height: 12),
         GestureDetector(
-          onTap: () => context.go('/register'),
+          onTap: () => _completeAndGo('/register'),
           child: Container(
             height: 56,
             decoration: BoxDecoration(

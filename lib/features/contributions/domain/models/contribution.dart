@@ -1,4 +1,5 @@
 // ignore_for_file: constant_identifier_names
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum PaymentMethod { CASH, BANK_TRANSFER }
 
@@ -62,6 +63,22 @@ class Contribution {
   bool get isVerified => status == ContributionStatus.VERIFIED;
   bool get isRejected => status == ContributionStatus.REJECTED;
 
+  static DateTime _parseDate(dynamic val) {
+    if (val == null) return DateTime.now();
+    if (val is Timestamp) return val.toDate();
+    if (val is int) return DateTime.fromMillisecondsSinceEpoch(val);
+    if (val is String) return DateTime.tryParse(val) ?? DateTime.now();
+    return DateTime.now();
+  }
+
+  static DateTime? _parseDateNullable(dynamic val) {
+    if (val == null) return null;
+    if (val is Timestamp) return val.toDate();
+    if (val is int) return DateTime.fromMillisecondsSinceEpoch(val);
+    if (val is String) return DateTime.tryParse(val);
+    return null;
+  }
+
   factory Contribution.fromMap(Map<String, dynamic> map, String id) {
     return Contribution(
       id: id,
@@ -73,9 +90,7 @@ class Contribution {
         (e) => e.name == map['paymentMethod'],
         orElse: () => PaymentMethod.CASH,
       ),
-      paymentDate: map['paymentDate'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['paymentDate'] as int)
-          : DateTime.now(),
+      paymentDate: _parseDate(map['paymentDate']),
       note: map['note'] as String?,
       receivedBy: map['receivedBy'] as String?,
       bankName: map['bankName'] as String?,
@@ -86,17 +101,11 @@ class Contribution {
         orElse: () => ContributionStatus.PENDING_VERIFICATION,
       ),
       verifiedBy: map['verifiedBy'] as String?,
-      verifiedAt: map['verifiedAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['verifiedAt'] as int)
-          : null,
+      verifiedAt: _parseDateNullable(map['verifiedAt']),
       rejectionReason: map['rejectionReason'] as String?,
       receiptId: map['receiptId'] as String?,
-      createdAt: map['createdAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int)
-          : DateTime.now(),
-      updatedAt: map['updatedAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] as int)
-          : DateTime.now(),
+      createdAt: _parseDate(map['createdAt']),
+      updatedAt: _parseDate(map['updatedAt']),
     );
   }
 

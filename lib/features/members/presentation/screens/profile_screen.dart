@@ -135,7 +135,7 @@ class ProfileScreen extends ConsumerWidget {
                                 modeName = 'System';
                               }
                               return ListTile(
-                                leading: Icon(icon, color: AppColors.primary, size: 22),
+                                leading: Icon(icon, color: theme.colorScheme.primary, size: 22),
                                 title: Text('Theme', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
                                 subtitle: Text(modeName, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500)),
                                 trailing: const Icon(Icons.chevron_right),
@@ -274,7 +274,7 @@ class _InfoTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return ListTile(
-      leading: Icon(icon, color: AppColors.primary, size: 22),
+      leading: Icon(icon, color: theme.colorScheme.primary, size: 22),
       title: Text(label,
           style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),

@@ -97,13 +97,14 @@ class _Avatar extends StatelessWidget {
     final initials = member.fullName.isNotEmpty
         ? member.fullName.trim().split(' ').map((w) => w[0]).take(2).join()
         : '?';
+    final theme = Theme.of(context);
     return CircleAvatar(
       radius: 24,
-      backgroundColor: AppColors.primary.withValues(alpha: 0.15),
+      backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.15),
       child: Text(
         initials.toUpperCase(),
-        style: const TextStyle(
-          color: AppColors.primary,
+        style: TextStyle(
+          color: theme.colorScheme.primary,
           fontWeight: FontWeight.bold,
           fontSize: 14,
         ),
@@ -118,6 +119,7 @@ class _RoleBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final label = switch (role) {
       UserRole.SUPER_ADMIN => 'Super Admin',
       UserRole.ADMIN => 'Admin',
@@ -127,15 +129,15 @@ class _RoleBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: theme.colorScheme.primary.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w600,
-          color: AppColors.primary,
+          color: theme.colorScheme.primary,
         ),
       ),
     );
